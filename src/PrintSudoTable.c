@@ -1,6 +1,25 @@
 #include "PrintSudoTable.h"
 #include <stdio.h>
 #include <assert.h>
+#include "Cursor.h"
+
+/**
+ * 为打印数独盘面预先扩展空间
+ */
+static void ExpandSpace()
+{
+	for(int i = 0; i < 10; i++)
+	{
+		printf("\n");
+	}
+	MOVEUP(10);
+}
+
+static void ChangeLine(unsigned char offsetX)
+{
+	MOVEDOWN(1);
+	MOVELEFT(9);
+}
 
 static void PrintBlock(const struct SudoTable* const table,
 		               const unsigned char* index,
@@ -8,22 +27,29 @@ static void PrintBlock(const struct SudoTable* const table,
 					   unsigned char offsetY,
 					   unsigned char color)
 {
-	printf("\e[%dC\e[%dB\e[%dm", offsetX, offsetY, color);
+	MOVERIGHT(offsetX);
+	MOVEDOWN(offsetY);
+	SET_COLOR(color);
 	for(unsigned char i = 0; i < 9; i++)
 	{
 		unsigned short  value = table->cell[index[i]];
-		printf("%3d", value);
+		if(value != 0)
+		{
+			printf("%3d", value);
+		}
+		else
+		{
+			SET_COLOR(FORECOLOR_RED);
+			printf("  ?");
+			SET_COLOR(color);
+		}
 		if((i == 2)||(i == 5))
 		{
-			printf("\n");
-			printf("\e[%dC", offsetX);
+			ChangeLine(offsetX);
 		}
 	}
-	printf("\n");
-	printf("\e[1A");
-	printf("\e[3A\e[10D\e[37m");
-	printf("\e[%dD", offsetX);	
-	printf("\e[%dA", offsetY);
+	MOVEUP(2 + offsetY);
+	MOVELEFT(9 + offsetX);
 	return;
 }
 
@@ -36,15 +62,23 @@ void PrintSudoTable(const struct SudoTable* const table)
 		{3, 4, 5, 12, 13, 14, 21, 22, 23},
 		{6, 7, 8, 15, 16, 17, 24, 25, 26},
 		{27, 28, 29, 36, 37, 38, 45, 46, 47},
+		{30, 31, 32, 39, 40, 41, 48, 49, 50},
+		{33, 34, 35, 42, 4, 44, 51, 52, 53},
+		{54, 55, 56, 63, 64, 65, 72, 73, 74},
+		{57, 58, 59, 66, 67, 68, 75, 76, 77},
+		{60, 61, 62, 69, 70, 71, 78, 79, 80},
 	};
-	printf("\n");
-	PrintBlock(table, indexes[0], 0, 0, 37);
-	PrintBlock(table, indexes[1], 10, 0,35);
-//	PrintBlock(table, indexes[2], 19, 0, 37);
-//	printf("\n");
-//	PrintBlock(table, indexes[3], 0, 3, 35);
-//	printf("\e[3B");
-	printf("\n");
+	ExpandSpace();
+	PrintBlock(table, indexes[0], 0, 0, FORECOLOR_WHITE);
+	PrintBlock(table, indexes[1], 9, 0, FORECOLOR_PURPLE);
+	PrintBlock(table, indexes[2], 18, 0, FORECOLOR_WHITE);
+	PrintBlock(table, indexes[3], 0, 3, FORECOLOR_PURPLE);
+	PrintBlock(table, indexes[4], 9, 3, FORECOLOR_WHITE);
+	PrintBlock(table, indexes[5], 18, 3, FORECOLOR_PURPLE);
+	PrintBlock(table, indexes[6], 0, 6, FORECOLOR_WHITE);
+	PrintBlock(table, indexes[7], 9, 6, FORECOLOR_PURPLE);
+	PrintBlock(table, indexes[8], 18, 6, FORECOLOR_WHITE);
+	MOVEDOWN(10);
 	return;
 }
 
