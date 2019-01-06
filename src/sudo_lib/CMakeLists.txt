@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 3.10)
+
 AUX_SOURCE_DIRECTORY(. SUDO_LIB_SRCS)
 
 ADD_LIBRARY(SudoLib ${SUDO_LIB_SRCS})
