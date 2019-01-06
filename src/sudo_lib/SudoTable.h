@@ -5,3 +5,6 @@ struct SudoTable
 	unsigned short cell[81];
 };
 
+
+
+
